@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz: Desafios na Preparação de Pregações</title>
+    <meta name="description" content="Descubra como nunca mais travar na hora de preparar suas mensagens">
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        /* Tela de Introdução (Cabeçalho Azul) */
+        .intro-screen {
+            background: linear-gradient(135deg, #2d6cdf 0%, #1a4fba 100%);
+            color: white;
+            padding: 50px 30px;
+            text-align: center;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .intro-screen.active {
+            display: flex;
+        }
+        
+        .intro-screen.hidden {
+            display: none;
+        }
+        
+        .intro-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+        
+        .intro-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+        
+        .start-btn {
+            display: inline-block;
+            background: white;
+            color: #2d6cdf;
+            text-decoration: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .start-btn:hover {
+            background: #f0f7ff;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+        }
+        
+        .start-btn:active {
+            transform: translateY(-2px);
+        }
+        
+        /* Content */
+        .content {
+            padding: 30px 24px;
+        }
+        
+        /* Sistema de telas */
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Perguntas */
+        .question-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            background: #2d6cdf;
+            color: white;
+            border-radius: 50%;
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 28px;
+            line-height: 1.4;
+        }
+        
+        /* Opções */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        
+        .option {
+            padding: 20px 24px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.05rem;
+            font-weight: 500;
+        }
+        
+        .option:hover {
+            border-color: #2d6cdf;
+            background: #f0f7ff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(45, 108, 223, 0.15);
+        }
+        
+        /* Barra de progresso */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #e8ecf3;
+            border-radius: 4px;
+            margin-top: 40px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2d6cdf, #4a9eff);
+            transition: width 0.5s ease;
+        }
+        
+        /* Loading */
+        .loading-screen {
+            text-align: center;
+            padding: 80px 24px;
+        }
+        
+.price-box {
+    text-align: center;
+    margin-bottom: 16px;
+    font-family: Arial, sans-serif;
+}
+
+.old-price {
+    display: block;
+    font-size: 16px;
+    color: #fd0202;
+    text-decoration: line-through;
+}
+
+.new-price {
+    display: block;
+    font-size: 26px;
+    font-weight: bold;
+    color: #0bb14b; /* verde de conversão */
+}
+
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f0f7ff;
+            border-top: 4px solid #2d6cdf;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 28px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Resultado */
+        .result-screen {
+            text-align: center;
+            padding: 40px 24px 60px;
+        }
+        
+        .result-title {
+            color: #1a237e;
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+        
+        /* VIDEO */
+        .video-container {
+            margin: 40px 0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            background: #000;
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        /* BOTÃO VERDE - DESTAQUE MÁXIMO */
+        .checkout-btn-container {
+            margin: 50px auto 20px;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+
+.gold-word {
+    background: linear-gradient(90deg, #c9a227, #ffd700, #c9a227);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+}
+
+
+
+.product-description {
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.product-description h3 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.product-description p {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.5;
+}
+
+
+        .checkout-btn {
+            display: inline-block;
+            width: 100%;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            text-decoration: none;
+            padding: 28px 40px;
+            border-radius: 18px;
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            transition: all 0.4s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 12px 35px rgba(40, 167, 69, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .checkout-btn:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 20px 50px rgba(40, 167, 69, 0.5);
+        }
+        
+        .checkout-btn:active {
+            transform: translateY(-4px) scale(1.01);
+        }
+        
+        .checkout-btn::after {
+            content: "→";
+            position: absolute;
+            right: 35px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            font-weight: 900;
+            animation: arrowPulse 2s infinite;
+        }
+        
+        @keyframes arrowPulse {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(-50%) translateX(5px); }
+        }
+        
+        /* Efeito brilho */
+        .checkout-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { left: -100%; }
+            20%, 100% { left: 100%; }
+        }
+        
+        /* Garantia */
+        .guarantee {
+            color: #666;
+            font-size: 0.95rem;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .guarantee .icon {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: #777;
+            font-size: 0.9rem;
+            margin-top: 30px;
+            padding: 0 20px;
+            max-width: 800px;
+            margin: 30px auto 0;
+        }
+        
+        /* MOBILE */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            
+            .intro-screen {
+                padding: 40px 20px;
+                min-height: 400px;
+            }
+            
+            .intro-title {
+                font-size: 1.6rem;
+            }
+            
+            .intro-subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 30px;
+            }
+            
+            .start-btn {
+                padding: 16px 35px;
+                font-size: 1.1rem;
+            }
+            
+            .content {
+                padding: 24px 20px;
+            }
+            
+            .question-text {
+                font-size: 1.3rem;
+            }
+            
+            .option {
+                padding: 18px 20px;
+                font-size: 1rem;
+            }
+            
+            .result-title {
+                font-size: 1.6rem;
+                margin-bottom: 10px;
+            }
+            
+            /* VÍDEO */
+            .video-container {
+                margin: 15px 0 8px;
+                border-radius: 12px;
+            }
+            
+            /* BOTÃO MOBILE */
+            .checkout-btn-container {
+                margin: 0 0 60px;
+                padding: 0;
+                max-width: 100%;
+            }
+            
+            .checkout-btn {
+                padding: 20px 16px;
+                font-size: 1.2rem;
+                border-radius: 12px;
+                box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+                position: relative;
+                bottom: auto;
+                left: auto;
+                right: auto;
+                z-index: 1;
+                max-width: 100%;
+                width: 100%;
+                margin: 0;
+                animation: pulseGreen 1.5s infinite;
+            }
+            
+            @keyframes pulseGreen {
+                0%, 100% { 
+                    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.35);
+                    transform: scale(1);
+                }
+                50% { 
+                    box-shadow: 0 12px 30px rgba(40, 167, 69, 0.5);
+                    transform: scale(1.01);
+                }
+            }
+            
+            .checkout-btn::after {
+                right: 16px;
+                font-size: 1.4rem;
+            }
+            
+            /* Ajuste no resultado screen */
+            .result-screen {
+                padding: 15px 10px 40px;
+            }
+            
+            /* Garantia mobile */
+            .guarantee {
+                font-size: 0.8rem;
+                flex-direction: row;
+                gap: 6px;
+                margin-top: 10px;
+            }
+        }
+        
+        /* Mobile pequeno */
+        @media (max-width: 480px) {
+            .intro-title {
+                font-size: 1.4rem;
+            }
+            
+            .intro-subtitle {
+                font-size: 1rem;
+            }
+            
+            .start-btn {
+                padding: 14px 30px;
+                font-size: 1rem;
+            }
+            
+            .checkout-btn {
+                padding: 18px 14px;
+                font-size: 1.1rem;
+            }
+            
+            .checkout-btn::after {
+                right: 14px;
+                font-size: 1.2rem;
+            }
+            
+            .result-title {
+                font-size: 1.4rem;
+            }
+            
+            .video-container {
+                margin: 12px 0 6px;
+            }
+            
+            .result-screen {
+                padding: 12px 8px 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- TELA DE INTRODUÇÃO (APENAS A PRIMEIRA TELA) -->
+        <div class="intro-screen active" id="intro">
+            <h1 class="intro-title">🙏 Descubra Por Que Preparar Pregações Está Tão Pesado</h1>
+            <p class="intro-subtitle">🎁 Responda este quiz rápido e descubra como nunca mais travar na hora de preparar suas mensagens.</p>
+            <button class="start-btn" id="startBtn">COMEÇAR AGORA</button>
+        </div>
+        
+        <!-- CONTEÚDO DO QUIZ (COMEÇA ESCONDIDO) -->
+        <div class="content" id="quizContent" style="display: none;">
+            <!-- Pergunta 1 -->
+            <div id="q1" class="screen">
+                <div class="question-number">1</div>
+                <h2 class="question-text">Qual é o seu MAIOR desafio hoje ao preparar pregações?</h2>
+                <div class="options">
+                    <div class="option" data-next="q2">⏰ Falta de tempo durante a semana</div>
+                    <div class="option" data-next="q2">😰 Insegurança na hora de pregar</div>
+                    <div class="option" data-next="q2">💭 Falta de ideias e inspiração</div>
+                    <div class="option" data-next="q2">💤 Medo de repetir sempre os mesmos temas</div>
+                </div>
+                <div class="progress-container"><div class="progress-bar" style="width: 12.5%"></div></div>
+            </div>
+            
+            <!-- Pergunta 2 -->
+            <div id="q2" class="screen">
+                <div class="question-number">2</div>
+                <h2 class="question-text">Quantas mensagens você precisa preparar por mês?</h2>
+                <div class="options">
+                    <div class="option" data-next="q3">1 a 2</div>
+                    <div class="option" data-next="q3">3 a 5</div>
+                    <div class="option" data-next="q3">6 a 8</div>
+                    <div class="option" data-next="q3">Mais de 8 (é puxado demais)</div>
+                </div>
+                <div class="progress-container"><div class="progress-bar" style="width: 25%"></div></div>
+            </div>
+            
+            <!-- Pergunta 3 -->
+            <div id="q3" class="screen">
+                <div class="question-number">3</div>
+                <h2 class="question-text">Hoje, você se sente preparado quando sobe ao púlpito?</h2>
+                <div class="options">
+                    <div class="option" data-next="q4">Sempre, chego confiante</div>
+                    <div class="option" data-next="q4">Na maioria das vezes</div>
+                    <div class="option" data-next="q4">Às vezes fico inseguro</div>
+                    <div class="option" data-next="q4">Muitas vezes vou no improviso</div>
+                </div>
+                <div class="progress-container"><div class="progress-bar" style="width: 37.5%"></div></div>
+            </div>
+            
+            <!-- Pergunta 4 -->
+            <div id="q4" class="screen">
+                <div class="question-number">4</div>
+                <h2 class="question-text">Quanto tempo, em média, você gasta preparando UMA pregação?</h2>
+                <div class="options">
+                    <div class="option" data-next="q5">Menos de 2 horas</div>
+                    <div class="option" data-next="q5">De 3 a 5 horas</div>
+                    <div class="option" data-next="q5">De 6 a 10 horas</div>
+                    <div class="option" data-next="q5">Mais de 10 horas (está pesado)</div>
+                </div>
+                <div class="progress-container"><div class="progress-bar" style="width: 50%"></div></div>
+            </div>
+            
+            <!-- Pergunta 5 -->
+            <div id="q5" class="screen">
+                <div class="question-number">5</div>
+                <h2 class="question-text">Isso afeta sua vida pessoal ou emocional?</h2>
+                <div class="options">
+                    <div class="option" data-next="q6">Sim, quase não sobra tempo pra família</div>
+                    <div class="option" data-next="q6">Um pouco, poderia ser melhor</div>
+                    <div class="option" data-next="q6">Não afeta tanto, mas quero otimizar</div>
+                    <div class="option" data-next="q6">Nunca pensei nisso, mas agora percebo</div>
+                </div>
+                <div class="progress-container"><div class="progress-bar" style="width: 62.5%"></div></div>
+            </div>
+            
+            <!-- Pergunta 6 -->
+            <div id="q6" class="screen">
+                <div class="question-number">6</div>
+                <h2 class="question-text">Qual perfil mais se parece com você?</h2>
+                <div class="options">
+                    <div class="option" data-next="q7">Pastor titular</div>
+                    <div class="option" data-next="q7">Pastor auxiliar</div>
+                    <div class="option" data-next="q7">Líder de ministério</div>
+                    <div class="option" data-next="q7">Iniciante / estudante da Palavra</div>
+                </div>
+                <div class="progress-container"><div class="progress-bar" style="width: 75%"></div></div>
+            </div>
+            
+            <!-- Pergunta 7 -->
+            <div id="q7" class="screen">
+                <div class="question-number">7</div>
+                <h2 class="question-text">Que tipo de mensagem sua igreja MAIS precisa hoje?</h2>
+                <div class="options">
+                    <div class="option" data-next="q8">Bíblica e profunda</div>
+                    <div class="option" data-next="q8">Prática para o dia a dia</div>
+                    <div class="option" data-next="q8">Reflexiva e transformadora</div>
+                    <div class="option" data-next="q8">Um equilíbrio de tudo isso</div>
+                </div>
+                <div class="progress-container"><div class="progress-bar" style="width: 87.5%"></div></div>
+            </div>
+            
+            <!-- Pergunta 8 -->
+            <div id="q8" class="screen">
+                <div class="question-number">8</div>
+                <h2 class="question-text">Você já usou esboços ou materiais prontos?</h2>
+                <div class="options">
+                    <div class="option" data-next="loading">Sim, uso sempre</div>
+                    <div class="option" data-next="loading">Às vezes, quando preciso</div>
+                    <div class="option" data-next="loading">Raramente</div>
+                    <div class="option" data-next="loading">Nunca usei</div>
+                </div>
+                <div class="progress-container"><div class="progress-bar" style="width: 100%"></div></div>
+            </div>
+            
+            <!-- Loading -->
+            <div id="loading" class="screen loading-screen">
+                <div class="spinner"></div>
+                <h2>Analisando suas respostas...</h2>
+                <p>Preparando sua solução personalizada</p>
+            </div>
+            
+            <!-- Checkout -->
+            <div id="result" class="screen result-screen">
+                <h2 class="result-title">🙏 O problema não é falta de unção. É falta de estrutura.</h2>
+                
+                <!-- Vídeo -->
+                <div class="video-container">
+                    <!-- SUBSTITUA pelo seu vídeo do YouTube -->
+                    <iframe 
+                        src="https://vimeo.com/1159046279?fl=pl&fe=cm"
+                        title="Solução para preparação de pregações"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                        loading="lazy"
+                    ></iframe>
+                </div>
+
+                <!-- DESCRIÇÃO DO PRODUTO -->
+<div class="product-description">
+    <h3><span class="gold-word">PREGUE</span> POR UM ANO INTEIRO</h3>
+
+   
+</div>
+
+
+
+
+                <!-- PREÇO -->
+<div class="price-box">
+    <span class="old-price">De R$ 99,90</span>
+    <span class="new-price">Por apenas R$ 10,00</span>
+</div>
+
+                <!-- BOTÃO VERDE - APENAS O BOTÃO -->
+                <div class="checkout-btn-container">
+                    <!-- SUBSTITUA href pelo seu link de checkout -->
+                    <a href="https://pay.lowify.com.br/checkout?product_id=NZ2rJS" target="_blank" class="checkout-btn">
+                        ACESSAR SOLUÇÃO COMPLETA
+                    </a>
+                    
+                    <div class="guarantee">
+                        <span class="icon">✓</span>
+                        <span>Garantia de 7 dias ou seu dinheiro de volta</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Este quiz tem caráter informativo e diagnóstico. As respostas são anônimas.</p>
+    </div>
+
+    <script>
+        // Navegação do quiz
+        document.addEventListener('DOMContentLoaded', function() {
+            const introScreen = document.getElementById('intro');
+            const quizContent = document.getElementById('quizContent');
+            const startBtn = document.getElementById('startBtn');
+            const screens = document.querySelectorAll('.screen');
+            const options = document.querySelectorAll('.option');
+            
+            // Inicia o quiz (esconde introdução, mostra primeira pergunta)
+            function startQuiz() {
+                // Esconde a tela de introdução
+                introScreen.classList.remove('active');
+                introScreen.style.display = 'none';
+                
+                // Mostra o conteúdo do quiz
+                quizContent.style.display = 'block';
+                
+                // Mostra a primeira pergunta
+                goToScreen('q1');
+            }
+            
+            // Vai para tela específica
+            function goToScreen(screenId) {
+                // Primeiro, esconde todas as telas
+                screens.forEach(s => {
+                    s.classList.remove('active');
+                    s.style.display = 'none';
+                });
+                
+                // Mostra a tela desejada
+                const target = document.getElementById(screenId);
+                if (target) {
+                    target.style.display = 'block';
+                    setTimeout(() => {
+                        target.classList.add('active');
+                    }, 10);
+                    
+                    // No mobile, scroll para o topo
+                    if (window.innerWidth < 768) {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                    
+                    // Se for loading, vai para resultado
+                    if (screenId === 'loading') {
+                        setTimeout(() => goToScreen('result'), 1500);
+                    }
+                }
+            }
+            
+            // Evento no botão "Começar Agora"
+            startBtn.addEventListener('click', startQuiz);
+            
+            // Eventos nas opções do quiz
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    const next = this.getAttribute('data-next');
+                    if (next) goToScreen(next);
+                });
+            });
+            
+            // No mobile, destaque especial no botão verde
+            const checkoutBtn = document.querySelector('.checkout-btn');
+            if (checkoutBtn && window.innerWidth < 768) {
+                // Scroll para o botão quando chegar no resultado
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            setTimeout(() => {
+                                checkoutBtn.scrollIntoView({ 
+                                    behavior: 'smooth', 
+                                    block: 'center' 
+                                });
+                            }, 500);
+                        }
+                    });
+                });
+                
+                const resultScreen = document.getElementById('result');
+                if (resultScreen) observer.observe(resultScreen);
+            }
+        });
+    </script>
+</body>
+</html>
